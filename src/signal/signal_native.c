@@ -17,9 +17,8 @@ static void usr1_handler(int sig) {
 }
 
 int mdclip_register_usr1(void) {
-  struct sigaction sa;
+  struct sigaction sa = {0};
   sa.sa_handler = usr1_handler;
-  sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
   return sigaction(SIGUSR1, &sa, NULL) == 0 ? 0 : -1;
 }

@@ -8,7 +8,7 @@ pub fn markdown_to_styled_html(source : String) -> String {
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n",
   )
   buf.write_string(
-    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; img-src data: https:; frame-src 'none'; form-action 'none'; base-uri 'none';\">\n",
+    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'none'; object-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-src 'none'; form-action 'none'; base-uri 'none'; sandbox allow-same-origin;\">\n",
   )
   buf.write_string("<title>Clipboard Markdown Preview</title>\n")
   buf.write_string(css)
