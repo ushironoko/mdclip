@@ -14,10 +14,8 @@ Powered by [mizchi/markdown.mbt](https://github.com/mizchi/markdown.mbt) (MoonBi
 ### via mooncakes.io (recommended)
 
 ```bash
-moon install ushironoko/mdclip/src/mdclip
+moon install ushironoko/mdclip/...
 ```
-
-The binary is installed to `~/.moon/bin/mdclip`.
 
 ### Build from source
 
