@@ -1,7 +1,11 @@
 ///|
 #cfg(not(platform="windows"))
 pub async fn read_clipboard() -> String {
-  let (exit_code, data) = @process.collect_stdout("pbpaste", [])
+  let (exit_code, data) = @process.collect_stdout(
+    "pbpaste",
+    [],
+    extra_env={"LC_CTYPE": "UTF-8"},
+  )
   if exit_code == 0 {
     try {
       data.text()

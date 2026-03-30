@@ -46,13 +46,12 @@ async fn ensure_cache_dir() -> Unit {
   }
 }
 
-async fn handle_trigger() -> Unit {
-  let clipboard_content = read_clipboard()
-  if clipboard_content.is_empty() {
-    println("mdclip: clipboard is empty, skipping")
+async fn render_and_open(content : String) -> Unit {
+  if content.is_empty() {
+    println("mdclip: content is empty, skipping")
     return
   }
-  let html = @viewer.markdown_to_styled_html(clipboard_content)
+  let html = @viewer.markdown_to_styled_html(content)
   ensure_cache_dir()
   let html_path = get_html_path()
   @fs.write_file(
@@ -65,7 +64,32 @@ async fn handle_trigger() -> Unit {
 }
 
 pub async fn run_once() -> Unit {
-  handle_trigger()
+  let clipboard_content = read_clipboard()
+  if clipboard_content.is_empty() {
+    println("mdclip: clipboard is empty, skipping")
+    return
+  }
+  render_and_open(clipboard_content)
+}
+
+pub async fn run_from_file(file_path : String) -> Unit {
+  let data = try {
+    @fs.read_file(file_path.to_string_view())
+  } catch {
+    _ => {
+      println("mdclip: failed to read file: \{file_path}")
+      return
+    }
+  }
+  let content = try {
+    data.text()
+  } catch {
+    _ => {
+      println("mdclip: failed to decode file: \{file_path}")
+      return
+    }
+  }
+  render_and_open(content)
 }
 
 fn is_valid_pid(s : String) -> Bool {
@@ -121,7 +145,6 @@ pub async fn run_daemon() -> Unit {
   let pid = @signal.get_pid()
   ensure_cache_dir()
   let pid_path = get_pid_path()
-  // check for stale PID file
   match read_pid_file() {
     Some(existing_pid) => {
       let exit_code = @process.run("kill", ["-0", existing_pid])
@@ -129,7 +152,6 @@ pub async fn run_daemon() -> Unit {
         println("mdclip: daemon already running (PID: \{existing_pid})")
         return
       }
-      // stale PID file, remove and continue
       remove_pid_file()
     }
     None => ()
@@ -143,7 +165,10 @@ pub async fn run_daemon() -> Unit {
   println("mdclip: send USR1 to trigger: kill -USR1 \{pid}")
   while true {
     if @signal.poll_usr1() {
-      handle_trigger()
+      let clipboard_content = read_clipboard()
+      if not(clipboard_content.is_empty()) {
+        render_and_open(clipboard_content)
+      }
     }
     @async.sleep(200)
   }
@@ -163,7 +188,6 @@ pub async fn send_trigger() -> Unit {
     Some(p) => p
     None => return
   }
-  // verify process exists before sending signal
   let check = @process.run("kill", ["-0", pid])
   if check != 0 {
     println("mdclip: daemon not running (stale PID file), cleaning up")
