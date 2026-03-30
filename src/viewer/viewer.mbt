@@ -11,7 +11,12 @@ pub fn markdown_to_styled_html(source : String) -> String {
     None => "Clipboard Markdown Preview"
   }
   let headings = collect_headings(doc)
-  let toc_html = if headings.length() > 0 { toc_to_html(headings) } else { "" }
+  let toc_headings = headings.filter(fn(h) { not(h.in_footnote) })
+  let toc_html = if toc_headings.length() > 0 {
+    toc_to_html(toc_headings)
+  } else {
+    ""
+  }
   let html_body = render_html_enhanced(doc, headings)
   let css = github_css()
   let buf = StringBuilder::new()

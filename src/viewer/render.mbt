@@ -6,6 +6,7 @@ pub(all) struct HeadingInfo {
   level : Int
   text : String
   id : String
+  in_footnote : Bool
 }
 
 ///|
@@ -13,7 +14,7 @@ fn collect_headings(doc : @markdown.Document) -> Array[HeadingInfo] {
   let headings : Array[HeadingInfo] = []
   let id_counts : Map[String, Int] = {}
   for block in doc.children {
-    collect_headings_from_block(block, headings, id_counts)
+    collect_headings_from_block(block, headings, id_counts, false)
   }
   headings
 }
@@ -23,6 +24,7 @@ fn collect_headings_from_block(
   block : @markdown.Block,
   headings : Array[HeadingInfo],
   id_counts : Map[String, Int],
+  in_footnote : Bool,
 ) -> Unit {
   match block {
     @markdown.Block::Heading(level~, children~, ..) => {
@@ -38,27 +40,27 @@ fn collect_headings_from_block(
           base_id
         }
       }
-      headings.push({ level, text, id })
+      headings.push({ level, text, id, in_footnote })
     }
     @markdown.Block::Blockquote(children~, ..) =>
       for child in children {
-        collect_headings_from_block(child, headings, id_counts)
+        collect_headings_from_block(child, headings, id_counts, in_footnote)
       }
     @markdown.Block::BulletList(items~, ..) =>
       for item in items {
         for child in item.children {
-          collect_headings_from_block(child, headings, id_counts)
+          collect_headings_from_block(child, headings, id_counts, in_footnote)
         }
       }
     @markdown.Block::OrderedList(items~, ..) =>
       for item in items {
         for child in item.children {
-          collect_headings_from_block(child, headings, id_counts)
+          collect_headings_from_block(child, headings, id_counts, in_footnote)
         }
       }
     @markdown.Block::FootnoteDefinition(children~, ..) =>
       for child in children {
-        collect_headings_from_block(child, headings, id_counts)
+        collect_headings_from_block(child, headings, id_counts, true)
       }
     _ => ()
   }
