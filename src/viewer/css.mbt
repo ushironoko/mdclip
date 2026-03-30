@@ -1,3 +1,4 @@
+///|
 pub fn github_css() -> String {
   let css =
     #|<style>
@@ -61,6 +62,26 @@ pub fn github_css() -> String {
     #|.markdown-body table th { font-weight: 600; }
     #|.markdown-body table tr { background-color: var(--bgColor-default); border-top: 1px solid var(--borderColor-muted); }
     #|.markdown-body table tr:nth-child(2n) { background-color: var(--bgColor-muted); }
+    #|.markdown-body h1, .markdown-body h2, .markdown-body h3,
+    #|.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+    #|  scroll-margin-top: 1rem;
+    #|}
+    #|.markdown-body pre.highlight {
+    #|  background-color: #0d1117; color: #e6edf3; border-radius: 6px;
+    #|  padding: 1rem; margin-top: 0; margin-bottom: 1rem; overflow: auto;
+    #|  font-family: var(--fontStack-monospace); font-size: 85%; line-height: 1.45;
+    #|}
+    #|.markdown-body pre.highlight code { display: inline; padding: 0; margin: 0; background-color: transparent; border: 0; }
+    #|.markdown-body .toc {
+    #|  border: 1px solid var(--borderColor-default); border-radius: 6px;
+    #|  padding: 1rem 1.5rem; margin-bottom: 1.5rem;
+    #|}
+    #|.markdown-body .toc ul { list-style: none; padding-left: 0; margin: 0; }
+    #|.markdown-body .toc li { margin: 0.25em 0; }
+    #|.markdown-body .toc li[data-level="3"] { padding-left: 1em; }
+    #|.markdown-body .toc li[data-level="4"] { padding-left: 2em; }
+    #|.markdown-body .toc a { color: var(--fgColor-accent); text-decoration: none; }
+    #|.markdown-body .toc a:hover { text-decoration: underline; }
     #|</style>
   css
 }

@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/process",
+  "moonbitlang/async/fs",
+  "ushironoko/mdclip/src/signal",
+  "ushironoko/mdclip/src/viewer",
+  "moonbitlang/x/sys" @sys,
+}
