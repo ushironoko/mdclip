@@ -9,8 +9,17 @@ Powered by [mizchi/markdown.mbt](https://github.com/mizchi/markdown.mbt) (MoonBi
 ### Prerequisites
 
 - [MoonBit toolchain](https://www.moonbitlang.com/download)
+- `~/.moon/bin/` in your PATH
 
-### Build
+### via mooncakes.io (recommended)
+
+```bash
+moon install ushironoko/mdclip/src/mdclip
+```
+
+The binary is installed to `~/.moon/bin/mdclip`.
+
+### Build from source
 
 ```bash
 git clone https://github.com/ushironoko/mdclip.git
@@ -19,14 +28,14 @@ moon update
 moon build --target native --release
 ```
 
-### macOS
+macOS/Linux:
 
 ```bash
 cp _build/native/release/build/src/main/main.exe ~/.local/bin/mdclip
 chmod +x ~/.local/bin/mdclip
 ```
 
-### Windows
+Windows:
 
 ```powershell
 Copy-Item _build\native\release\build\src\main\main.exe $env:LOCALAPPDATA\mdclip\mdclip.exe
@@ -52,7 +61,7 @@ mdclip stop     # Stop daemon (macOS/Linux only)
 3. Drag **Run Shell Script** from the action library
 4. Set shell to `/bin/zsh`, paste:
    ```bash
-   /Users/<your-username>/.local/bin/mdclip once
+   ~/.moon/bin/mdclip once
    ```
 5. Save as **"Preview Clipboard Markdown"** (Cmd+S)
 6. Open **System Settings** > **Keyboard** > **Keyboard Shortcuts** > **Services**
