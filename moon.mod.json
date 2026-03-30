@@ -1,0 +1,16 @@
+{
+  "name": "ushironoko/mdclip",
+  "version": "0.1.0",
+  "readme": "README.mbt.md",
+  "repository": "https://github.com/ushironoko/mdclip",
+  "license": "MIT",
+  "keywords": ["markdown", "clipboard", "viewer"],
+  "description": "Signal-driven clipboard markdown viewer daemon",
+  "deps": {
+    "mizchi/markdown": "0.4.7",
+    "moonbitlang/async": "0.16.0",
+    "moonbitlang/x": "0.4.38"
+  },
+  "preferred-target": "native",
+  "warn-list": "-2"
+}
