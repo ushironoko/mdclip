@@ -1,0 +1,7 @@
+{
+  "native-stub": ["signal_native.c"],
+  "targets": {
+    "signal.mbt": ["native"],
+    "signal_native.c": ["native"]
+  }
+}

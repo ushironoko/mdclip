@@ -118,8 +118,10 @@ HTML output location:
 
 ## Security
 
-- **CSP header** blocks script execution, iframes, forms, and base-uri changes
-- `mizchi/markdown` passes raw HTML blocks through without sanitization, but CSP prevents execution of embedded scripts
+- **CSP**: `script-src 'none'`, `object-src 'none'`, `frame-src 'none'`, `form-action 'none'`, `img-src data:` only, `sandbox allow-same-origin`
+- **File permissions**: cache directory `0700`, files `0600` (owner-only access)
+- **PID validation**: numeric-only check, process existence verification (`kill -0`), stale PID cleanup
+- `mizchi/markdown` passes raw HTML blocks through without sanitization, but CSP and sandbox prevent script execution and external resource loading
 
 ## License
 

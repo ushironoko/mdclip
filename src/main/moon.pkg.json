@@ -1,0 +1,11 @@
+{
+  "is-main": true,
+  "import": [
+    "moonbitlang/async",
+    "ushironoko/mdclip/src/daemon",
+    {
+      "path": "moonbitlang/x/sys",
+      "alias": "sys"
+    }
+  ]
+}
