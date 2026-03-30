@@ -30,22 +30,24 @@ fn path_sep() -> String {
   "\\"
 }
 
+///|
 fn get_html_path() -> String {
   get_cache_dir() + path_sep() + "preview.html"
 }
 
+///|
 fn get_pid_path() -> String {
   get_cache_dir() + path_sep() + "mdclip.pid"
 }
 
+///|
 async fn ensure_cache_dir() -> Unit {
-  try {
-    @fs.mkdir(get_cache_dir().to_string_view(), permission=0o700, recursive=true)
-  } catch {
+  @fs.mkdir(get_cache_dir().to_string_view(), permission=0o700, recursive=true) catch {
     _ => ()
   }
 }
 
+///|
 async fn render_and_open(content : String) -> Unit {
   if content.is_empty() {
     println("mdclip: content is empty, skipping")
@@ -54,15 +56,12 @@ async fn render_and_open(content : String) -> Unit {
   let html = @viewer.markdown_to_styled_html(content)
   ensure_cache_dir()
   let html_path = get_html_path()
-  @fs.write_file(
-    html_path.to_string_view(),
-    html,
-    create=0o600,
-  )
+  @fs.write_file(html_path.to_string_view(), html, create=0o600)
   open_in_browser(html_path)
   println("mdclip: preview opened")
 }
 
+///|
 pub async fn run_once() -> Unit {
   let clipboard_content = read_clipboard()
   if clipboard_content.is_empty() {
@@ -72,18 +71,15 @@ pub async fn run_once() -> Unit {
   render_and_open(clipboard_content)
 }
 
+///|
 pub async fn run_from_file(file_path : String) -> Unit {
-  let data = try {
-    @fs.read_file(file_path.to_string_view())
-  } catch {
+  let data = @fs.read_file(file_path.to_string_view()) catch {
     _ => {
       println("mdclip: failed to read file: \{file_path}")
       return
     }
   }
-  let content = try {
-    data.text()
-  } catch {
+  let content = data.text() catch {
     _ => {
       println("mdclip: failed to decode file: \{file_path}")
       return
@@ -92,6 +88,7 @@ pub async fn run_from_file(file_path : String) -> Unit {
   render_and_open(content)
 }
 
+///|
 fn is_valid_pid(s : String) -> Bool {
   if s.is_empty() {
     return false
@@ -104,19 +101,16 @@ fn is_valid_pid(s : String) -> Bool {
   true
 }
 
+///|
 async fn read_pid_file() -> String? {
   let pid_path = get_pid_path()
-  let data = try {
-    @fs.read_file(pid_path.to_string_view())
-  } catch {
+  let data = @fs.read_file(pid_path.to_string_view()) catch {
     _ => {
       println("mdclip: no running daemon found (PID file missing)")
       return None
     }
   }
-  let pid_str = try {
-    data.text()
-  } catch {
+  let pid_str = data.text() catch {
     _ => {
       println("mdclip: failed to read PID file")
       return None
@@ -130,10 +124,9 @@ async fn read_pid_file() -> String? {
   Some(trimmed)
 }
 
+///|
 async fn remove_pid_file() -> Unit {
-  try {
-    @fs.remove(get_pid_path().to_string_view())
-  } catch {
+  @fs.remove(get_pid_path().to_string_view()) catch {
     _ => ()
   }
 }
@@ -156,11 +149,7 @@ pub async fn run_daemon() -> Unit {
     }
     None => ()
   }
-  @fs.write_file(
-    pid_path.to_string_view(),
-    pid.to_string(),
-    create=0o600,
-  )
+  @fs.write_file(pid_path.to_string_view(), pid.to_string(), create=0o600)
   println("mdclip: daemon started (PID: \{pid})")
   println("mdclip: send USR1 to trigger: kill -USR1 \{pid}")
   while true {

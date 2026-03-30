@@ -1,3 +1,4 @@
+///|
 async fn main {
   let args = @sys.get_cli_args()
   let command = if args.length() > 1 { args[1] } else { "once" }
@@ -16,7 +17,9 @@ async fn main {
       println("Usage: mdclip [once|file <path>|daemon|trigger|stop]")
       println("")
       println("Commands:")
-      println("  once           Read clipboard, convert to HTML, open browser (default)")
+      println(
+        "  once           Read clipboard, convert to HTML, open browser (default)",
+      )
       println("  file <path>    Read markdown from file")
       println("  daemon         Start daemon process (macOS/Linux only)")
       println("  trigger        Send USR1 signal to running daemon")

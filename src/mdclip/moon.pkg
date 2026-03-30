@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/async",
+  "ushironoko/mdclip/src/daemon",
+  "moonbitlang/x/sys" @sys,
+}
+
+options(
+  "is-main": true,
+)
