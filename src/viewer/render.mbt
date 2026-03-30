@@ -56,6 +56,10 @@ fn collect_headings_from_block(
           collect_headings_from_block(child, headings, id_counts)
         }
       }
+    @markdown.Block::FootnoteDefinition(children~, ..) =>
+      for child in children {
+        collect_headings_from_block(child, headings, id_counts)
+      }
     _ => ()
   }
 }

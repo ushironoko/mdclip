@@ -71,6 +71,48 @@ test "highlight_code returns Some for css" {
 }
 
 ///|
+test "highlight_code handles mixed-case TypeScript" {
+  let result = highlight_code("TypeScript", "const x = 1")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles uppercase JSON" {
+  let result = highlight_code("JSON", "{\"key\": 1}")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles mixed-case Bash" {
+  let result = highlight_code("Bash", "echo hello")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles uppercase RUST" {
+  let result = highlight_code("RUST", "fn main() {}")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles mixed-case Html" {
+  let result = highlight_code("Html", "<div>hello</div>")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles uppercase CSS" {
+  let result = highlight_code("CSS", "body { color: red; }")
+  inspect(result is Some(_), content="true")
+}
+
+///|
+test "highlight_code handles mixed-case JavaScript" {
+  let result = highlight_code("JavaScript", "const x = 1")
+  inspect(result is Some(_), content="true")
+}
+
+///|
 test "highlight_code returns None for unknown language" {
   let result = highlight_code("unknown", "code")
   inspect(result is None, content="true")

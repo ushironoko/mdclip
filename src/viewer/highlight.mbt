@@ -1,5 +1,6 @@
 ///|
 fn highlight_code(lang : String, code : String) -> String? {
+  let lang = lang.to_lower()
   match lang {
     "typescript" | "ts" => Some(@syntree_api.highlight_typescript(code))
     "javascript" | "js" => Some(@syntree_api.highlight_typescript(code))

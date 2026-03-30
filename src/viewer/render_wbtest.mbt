@@ -103,6 +103,42 @@ test "duplicate headings get unique ids" {
   inspect(headings[2].id, content="faq-2")
 }
 
+// Step 3c-2: heading inside footnote definition
+
+///|
+test "headings inside footnote definition are collected" {
+  let md =
+    #|## Before
+    #|
+    #|[^note]: Footnote with heading
+    #|  ## Inside Footnote
+    #|
+    #|## After
+  let doc = @markdown.parse(md)
+  let headings = collect_headings(doc.document)
+  inspect(headings.length(), content="3")
+  inspect(headings[0].id, content="before")
+  inspect(headings[1].id, content="inside-footnote")
+  inspect(headings[2].id, content="after")
+}
+
+///|
+test "heading ids remain correct with footnote containing heading" {
+  let md =
+    #|## First
+    #|
+    #|[^fn1]: A footnote
+    #|  ## Hidden
+    #|
+    #|## Second
+  let doc = @markdown.parse(md)
+  let headings = collect_headings(doc.document)
+  let html = render_html_enhanced(doc.document, headings)
+  inspect(html.contains("id=\"first\""), content="true")
+  inspect(html.contains("id=\"hidden\""), content="true")
+  inspect(html.contains("id=\"second\""), content="true")
+}
+
 // Step 3d: fenced code highlight
 
 ///|
