@@ -82,7 +82,7 @@ pub fn github_css() -> String {
     #|.markdown-body .toc li[data-level="4"] { padding-left: 2em; }
     #|.markdown-body .toc a { color: var(--fgColor-accent); text-decoration: none; }
     #|.markdown-body .toc a:hover { text-decoration: underline; }
-    #|.markdown-body iframe[sandbox] { background: #f6f8fa; border-radius: 6px; border: 1px solid #d0d7de; }
+    #|.markdown-body pre.mermaid { background: #f6f8fa; padding: 16px; border-radius: 6px; border: 1px solid #d0d7de; white-space: pre-wrap; font-family: var(--fontStack-monospace); text-align: center; }
     #|</style>
   css
 }

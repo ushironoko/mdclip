@@ -51,43 +51,25 @@ test "pipeline: full html document structure" {
 }
 
 ///|
-test "pipeline: mermaid block renders as sandboxed iframe" {
+test "pipeline: mermaid block includes CDN script" {
   let md = "```mermaid\ngraph TD;\n  A-->B;\n```"
   let html = markdown_to_styled_html(md)
-  inspect(html.contains("sandbox=\"allow-scripts\""), content="true")
-  inspect(html.contains("srcdoc="), content="true")
-  inspect(html.contains("mermaid"), content="true")
-}
-
-///|
-test "pipeline: mermaid preserves strict CSP in parent document" {
-  let md = "```mermaid\ngraph TD;\n```"
-  let html = markdown_to_styled_html(md)
-  inspect(html.contains("script-src 'none'"), content="true")
+  inspect(html.contains("cdn.jsdelivr.net"), content="true")
+  inspect(html.contains("startOnLoad"), content="true")
+  inspect(html.contains("securityLevel"), content="true")
 }
 
 ///|
 test "pipeline: no mermaid means strict CSP" {
   let html = markdown_to_styled_html("hello world")
   inspect(html.contains("script-src 'none'"), content="true")
-  inspect(html.contains("sandbox=\"allow-scripts\""), content="false")
+  inspect(html.contains("cdn.jsdelivr.net"), content="false")
 }
 
 ///|
-test "pipeline: mermaid iframe contains CDN reference in srcdoc" {
+test "pipeline: mermaid relaxes CSP for CDN only" {
   let md = "```mermaid\ngraph TD;\n```"
   let html = markdown_to_styled_html(md)
-  // CDN URL is inside the escaped srcdoc attribute, not in the parent document
-  inspect(html.contains("cdn.jsdelivr.net"), content="true")
-  inspect(html.contains("startOnLoad"), content="true")
-}
-
-///|
-test "pipeline: mermaid iframe sandbox prevents navigation" {
-  let md = "```mermaid\ngraph TD;\n```"
-  let html = markdown_to_styled_html(md)
-  // sandbox="allow-scripts" without allow-top-navigation blocks exfiltration
-  inspect(html.contains("sandbox=\"allow-scripts\""), content="true")
-  inspect(html.contains("allow-top-navigation"), content="false")
-  inspect(html.contains("allow-same-origin"), content="false")
+  inspect(html.contains("script-src https://cdn.jsdelivr.net"), content="true")
+  inspect(html.contains("script-src 'none'"), content="false")
 }
