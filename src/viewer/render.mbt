@@ -84,6 +84,28 @@ fn collect_headings_from_block(
 }
 
 ///|
+let mermaid_cdn_url : String = "https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.esm.min.mjs"
+
+///|
+fn mermaid_iframe(code : String) -> String {
+  let inner = StringBuilder::new()
+  inner.write_string("<!DOCTYPE html><html><head><meta charset=\"UTF-8\">")
+  inner.write_string("<style>body{margin:0;display:flex;justify-content:center;background:transparent}</style>")
+  inner.write_string("</head><body><pre class=\"mermaid\">\n")
+  inner.write_string(escape_html(code))
+  inner.write_string("</pre><script type=\"module\">\n")
+  inner.write_string("import mermaid from '")
+  inner.write_string(mermaid_cdn_url)
+  inner.write_string("';\nmermaid.initialize({startOnLoad:true,securityLevel:'strict'});\n")
+  inner.write_string("</script></body></html>")
+  let buf = StringBuilder::new()
+  buf.write_string("<iframe sandbox=\"allow-scripts\" srcdoc=\"")
+  buf.write_string(escape_html(inner.to_string()))
+  buf.write_string("\" style=\"width:100%;border:none;min-height:200px;overflow:auto;background:#f6f8fa;border-radius:6px;border:1px solid #d0d7de;\"></iframe>\n")
+  buf.to_string()
+}
+
+///|
 fn render_html_enhanced(
   doc : @markdown.Document,
   headings : Array[HeadingInfo],
@@ -140,9 +162,7 @@ fn render_block(
         let code_info = @markdown.parse_code_block_info(info)
         let lang = code_info.lang
         if lang.to_lower() == "mermaid" {
-          buf.write_string("<pre class=\"mermaid\">\n")
-          buf.write_string(escape_html(code))
-          buf.write_string("</pre>\n")
+          buf.write_string(mermaid_iframe(code))
         } else {
           match highlight_code(lang, code) {
             Some(highlighted) => {

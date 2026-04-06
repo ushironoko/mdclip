@@ -213,12 +213,13 @@ test "safe url in link is preserved" {
 // Mermaid support
 
 ///|
-test "mermaid block renders as pre.mermaid" {
+test "mermaid block renders as sandboxed iframe" {
   let md = "```mermaid\ngraph TD;\n  A-->B;\n```"
   let doc = @markdown.parse(md)
   let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
-  inspect(html.contains("<pre class=\"mermaid\">"), content="true")
+  inspect(html.contains("sandbox="), content="true")
+  inspect(html.contains("srcdoc="), content="true")
   inspect(html.contains("graph TD;"), content="true")
   inspect(html.contains("language-mermaid"), content="false")
 }
