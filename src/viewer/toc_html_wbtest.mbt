@@ -7,7 +7,9 @@ test "toc_to_html with empty array returns empty string" {
 
 ///|
 test "toc_to_html with single item" {
-  let items = [HeadingInfo::{ level: 2, text: "Hello", id: "hello", in_footnote: false }]
+  let items = [
+    HeadingInfo::{ level: 2, text: "Hello", id: "hello", in_footnote: false },
+  ]
   let result = toc_to_html(items)
   inspect(result.contains("<nav class=\"toc\">"), content="true")
   inspect(result.contains("href=\"#hello\""), content="true")

@@ -10,13 +10,14 @@ pub(all) struct HeadingInfo {
 }
 
 ///|
-fn collect_headings(doc : @markdown.Document) -> Array[HeadingInfo] {
+fn collect_headings(doc : @markdown.Document) -> (Array[HeadingInfo], Bool) {
   let headings : Array[HeadingInfo] = []
   let id_counts : Map[String, Int] = {}
+  let has_mermaid = Ref::new(false)
   for block in doc.children {
-    collect_headings_from_block(block, headings, id_counts, false)
+    collect_headings_from_block(block, headings, id_counts, false, has_mermaid)
   }
-  headings
+  (headings, has_mermaid.val)
 }
 
 ///|
@@ -25,6 +26,7 @@ fn collect_headings_from_block(
   headings : Array[HeadingInfo],
   id_counts : Map[String, Int],
   in_footnote : Bool,
+  has_mermaid : Ref[Bool],
 ) -> Unit {
   match block {
     @markdown.Block::Heading(level~, children~, ..) => {
@@ -42,25 +44,40 @@ fn collect_headings_from_block(
       }
       headings.push({ level, text, id, in_footnote })
     }
+    @markdown.Block::FencedCode(info~, ..) =>
+      if not(info.is_empty()) {
+        let code_info = @markdown.parse_code_block_info(info)
+        if code_info.lang.to_lower() == "mermaid" {
+          has_mermaid.val = true
+        }
+      }
     @markdown.Block::Blockquote(children~, ..) =>
       for child in children {
-        collect_headings_from_block(child, headings, id_counts, in_footnote)
+        collect_headings_from_block(
+          child, headings, id_counts, in_footnote, has_mermaid,
+        )
       }
     @markdown.Block::BulletList(items~, ..) =>
       for item in items {
         for child in item.children {
-          collect_headings_from_block(child, headings, id_counts, in_footnote)
+          collect_headings_from_block(
+            child, headings, id_counts, in_footnote, has_mermaid,
+          )
         }
       }
     @markdown.Block::OrderedList(items~, ..) =>
       for item in items {
         for child in item.children {
-          collect_headings_from_block(child, headings, id_counts, in_footnote)
+          collect_headings_from_block(
+            child, headings, id_counts, in_footnote, has_mermaid,
+          )
         }
       }
     @markdown.Block::FootnoteDefinition(children~, ..) =>
       for child in children {
-        collect_headings_from_block(child, headings, id_counts, true)
+        collect_headings_from_block(
+          child, headings, id_counts, true, has_mermaid,
+        )
       }
     _ => ()
   }
@@ -122,17 +139,23 @@ fn render_block(
       } else {
         let code_info = @markdown.parse_code_block_info(info)
         let lang = code_info.lang
-        match highlight_code(lang, code) {
-          Some(highlighted) => {
-            buf.write_string(highlighted)
-            buf.write_char('\n')
-          }
-          None => {
-            buf.write_string("<pre><code class=\"language-")
-            buf.write_string(escape_html(lang))
-            buf.write_string("\">")
-            buf.write_string(escape_html(code))
-            buf.write_string("</code></pre>\n")
+        if lang.to_lower() == "mermaid" {
+          buf.write_string("<pre class=\"mermaid\">\n")
+          buf.write_string(escape_html(code))
+          buf.write_string("</pre>\n")
+        } else {
+          match highlight_code(lang, code) {
+            Some(highlighted) => {
+              buf.write_string(highlighted)
+              buf.write_char('\n')
+            }
+            None => {
+              buf.write_string("<pre><code class=\"language-")
+              buf.write_string(escape_html(lang))
+              buf.write_string("\">")
+              buf.write_string(escape_html(code))
+              buf.write_string("</code></pre>\n")
+            }
           }
         }
       }

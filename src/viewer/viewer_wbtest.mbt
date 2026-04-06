@@ -49,3 +49,27 @@ test "pipeline: full html document structure" {
   inspect(html.contains("</html>"), content="true")
   inspect(html.contains("Content-Security-Policy"), content="true")
 }
+
+///|
+test "pipeline: mermaid block includes CDN script" {
+  let md = "```mermaid\ngraph TD;\n  A-->B;\n```"
+  let html = markdown_to_styled_html(md)
+  inspect(html.contains("cdn.jsdelivr.net"), content="true")
+  inspect(html.contains("startOnLoad"), content="true")
+  inspect(html.contains("securityLevel"), content="true")
+}
+
+///|
+test "pipeline: no mermaid means strict CSP" {
+  let html = markdown_to_styled_html("hello world")
+  inspect(html.contains("script-src 'none'"), content="true")
+  inspect(html.contains("cdn.jsdelivr.net"), content="false")
+}
+
+///|
+test "pipeline: mermaid relaxes CSP for CDN only" {
+  let md = "```mermaid\ngraph TD;\n```"
+  let html = markdown_to_styled_html(md)
+  inspect(html.contains("script-src https://cdn.jsdelivr.net"), content="true")
+  inspect(html.contains("script-src 'none'"), content="false")
+}

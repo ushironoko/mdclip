@@ -1,9 +1,10 @@
 // Step 3a: upstream compatibility
+
 ///|
 test "render paragraph matches upstream" {
   let doc = @markdown.parse("hello world")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -12,7 +13,7 @@ test "render paragraph matches upstream" {
 test "render emphasis matches upstream" {
   let doc = @markdown.parse("*emphasis* and **strong**")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -21,7 +22,7 @@ test "render emphasis matches upstream" {
 test "render blockquote matches upstream" {
   let doc = @markdown.parse("> quoted text")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -30,7 +31,7 @@ test "render blockquote matches upstream" {
 test "render thematic break matches upstream" {
   let doc = @markdown.parse("---")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -39,7 +40,7 @@ test "render thematic break matches upstream" {
 test "render bullet list matches upstream" {
   let doc = @markdown.parse("- item 1\n- item 2")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -48,7 +49,7 @@ test "render bullet list matches upstream" {
 test "render ordered list matches upstream" {
   let doc = @markdown.parse("1. first\n2. second")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -58,7 +59,7 @@ test "render table matches upstream" {
   let md = "| a | b |\n|---|---|\n| 1 | 2 |"
   let doc = @markdown.parse(md)
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -67,7 +68,7 @@ test "render table matches upstream" {
 test "render indented code matches upstream" {
   let doc = @markdown.parse("    code block")
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -77,7 +78,7 @@ test "render indented code matches upstream" {
 ///|
 test "heading gets id attribute" {
   let doc = @markdown.parse("## Hello World")
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("id=\"hello-world\""), content="true")
 }
@@ -85,7 +86,7 @@ test "heading gets id attribute" {
 ///|
 test "heading id from collect_headings" {
   let doc = @markdown.parse("## Hello World")
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   inspect(headings.length(), content="1")
   inspect(headings[0].id, content="hello-world")
   inspect(headings[0].level, content="2")
@@ -96,7 +97,7 @@ test "heading id from collect_headings" {
 ///|
 test "duplicate headings get unique ids" {
   let doc = @markdown.parse("## FAQ\n\n## FAQ\n\n## FAQ")
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   inspect(headings.length(), content="3")
   inspect(headings[0].id, content="faq")
   inspect(headings[1].id, content="faq-1")
@@ -115,7 +116,7 @@ test "headings inside footnote definition are collected" {
     #|
     #|## After
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   inspect(headings.length(), content="3")
   inspect(headings[0].id, content="before")
   inspect(headings[1].id, content="inside-footnote")
@@ -132,7 +133,7 @@ test "heading ids remain correct with footnote containing heading" {
     #|
     #|## Second
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("id=\"first\""), content="true")
   inspect(html.contains("id=\"hidden\""), content="true")
@@ -145,7 +146,7 @@ test "heading ids remain correct with footnote containing heading" {
 test "fenced code with unknown lang uses fallback" {
   let md = "```python\nprint('hello')\n```"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("language-python"), content="true")
 }
@@ -154,7 +155,7 @@ test "fenced code with unknown lang uses fallback" {
 test "fenced code with typescript uses highlight" {
   let md = "```typescript\nconst x = 1\n```"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("<pre class=\"highlight"), content="true")
 }
@@ -164,7 +165,7 @@ test "fenced code without lang matches upstream" {
   let md = "```\nplain code\n```"
   let doc = @markdown.parse(md)
   let upstream = @markdown.render_html(doc.document)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let enhanced = render_html_enhanced(doc.document, headings)
   inspect(upstream == enhanced, content="true")
 }
@@ -175,7 +176,7 @@ test "fenced code without lang matches upstream" {
 test "html block script tag is removed" {
   let md = "<script>alert(1)</script>\n"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("<script>"), content="false")
 }
@@ -184,7 +185,7 @@ test "html block script tag is removed" {
 test "html block safe tags are preserved" {
   let md = "<div>safe content</div>\n"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("<div>safe content</div>"), content="true")
 }
@@ -195,7 +196,7 @@ test "html block safe tags are preserved" {
 test "javascript url in link is removed" {
   let md = "[click](javascript:alert(1))"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("javascript:"), content="false")
 }
@@ -204,7 +205,49 @@ test "javascript url in link is removed" {
 test "safe url in link is preserved" {
   let md = "[click](https://example.com)"
   let doc = @markdown.parse(md)
-  let headings = collect_headings(doc.document)
+  let (headings, _) = collect_headings(doc.document)
   let html = render_html_enhanced(doc.document, headings)
   inspect(html.contains("https://example.com"), content="true")
+}
+
+// Mermaid support
+
+///|
+test "mermaid block renders as pre.mermaid" {
+  let md = "```mermaid\ngraph TD;\n  A-->B;\n```"
+  let doc = @markdown.parse(md)
+  let (headings, _) = collect_headings(doc.document)
+  let html = render_html_enhanced(doc.document, headings)
+  inspect(html.contains("<pre class=\"mermaid\">"), content="true")
+  inspect(html.contains("graph TD;"), content="true")
+  inspect(html.contains("language-mermaid"), content="false")
+}
+
+///|
+test "has_mermaid detects mermaid block" {
+  let doc = @markdown.parse("```mermaid\ngraph TD;\n```")
+  let (_, has_mermaid) = collect_headings(doc.document)
+  inspect(has_mermaid, content="true")
+}
+
+///|
+test "has_mermaid false when no mermaid" {
+  let doc = @markdown.parse("```typescript\nconst x = 1\n```")
+  let (_, has_mermaid) = collect_headings(doc.document)
+  inspect(has_mermaid, content="false")
+}
+
+///|
+test "has_mermaid case insensitive" {
+  let doc = @markdown.parse("```Mermaid\ngraph TD;\n```")
+  let (_, has_mermaid) = collect_headings(doc.document)
+  inspect(has_mermaid, content="true")
+}
+
+///|
+test "has_mermaid detects in blockquote" {
+  let md = "> ```mermaid\n> graph TD;\n> ```"
+  let doc = @markdown.parse(md)
+  let (_, has_mermaid) = collect_headings(doc.document)
+  inspect(has_mermaid, content="true")
 }

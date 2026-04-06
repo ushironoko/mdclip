@@ -10,7 +10,7 @@ pub fn markdown_to_styled_html(source : String) -> String {
       }
     None => "Clipboard Markdown Preview"
   }
-  let headings = collect_headings(doc)
+  let (headings, has_mermaid) = collect_headings(doc)
   let toc_headings = headings.filter(fn(h) { not(h.in_footnote) })
   let toc_html = if toc_headings.length() > 0 {
     toc_to_html(toc_headings)
@@ -25,9 +25,15 @@ pub fn markdown_to_styled_html(source : String) -> String {
   buf.write_string(
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n",
   )
-  buf.write_string(
-    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'none'; object-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-src 'none'; form-action 'none'; base-uri 'none';\">\n",
-  )
+  if has_mermaid {
+    buf.write_string(
+      "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src https://cdn.jsdelivr.net 'sha256-ymbwZcgbpGjgpuodsLnruFMOnlkrT9V65U8Rjr6Uxk8='; object-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-src 'none'; form-action 'none'; base-uri 'none';\">\n",
+    )
+  } else {
+    buf.write_string(
+      "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'none'; object-src 'none'; style-src 'unsafe-inline'; img-src data:; frame-src 'none'; form-action 'none'; base-uri 'none';\">\n",
+    )
+  }
   buf.write_string("<title>")
   buf.write_string(escape_html(title))
   buf.write_string("</title>\n")
@@ -38,6 +44,11 @@ pub fn markdown_to_styled_html(source : String) -> String {
   )
   buf.write_string(toc_html)
   buf.write_string(html_body)
+  if has_mermaid {
+    buf.write_string(
+      "<script type=\"module\">\nimport mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.esm.min.mjs';\nmermaid.initialize({ startOnLoad: true, securityLevel: 'strict' });\n</script>\n",
+    )
+  }
   buf.write_string("\n</article>\n</body>\n</html>\n")
   buf.to_string()
 }
